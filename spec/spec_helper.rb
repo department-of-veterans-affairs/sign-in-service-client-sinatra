@@ -4,16 +4,15 @@ require 'rspec'
 require 'rack/test'
 require 'webmock/rspec'
 require 'pry'
+require_relative '../app'
 
 ENV['APP_ENV'] = 'test'
-
-require_relative '../app'
 
 module RSpecMixin
   include Rack::Test::Methods
 
   def app
-    described_class
+    Sinatra::Application
   end
 end
 

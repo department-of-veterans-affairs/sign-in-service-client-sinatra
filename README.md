@@ -17,10 +17,16 @@ bin/server
 By default the server will be running on http://localhost:4567
 
 ### Docker
+Build image and start container
 ```bash
-docker compose up
+bin/up
 ```
 The server will be running on http://localhost:4567
+
+Remove container and cleanup
+```bash
+bin/down
+```
 
 ## Development
 ### App Configuration

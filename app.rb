@@ -4,7 +4,7 @@ require 'dotenv/load'
 require 'logger'
 require 'sinatra'
 require 'sinatra/custom_logger'
-require "sinatra/namespace"
+require 'sinatra/namespace'
 require 'pry' if development?
 
 set :erb, escape_html: true
@@ -21,13 +21,6 @@ namespace '/api' do
   end
 
   get '/health' do
-    {
-      healthy: 'true'
-    }.to_json
+    { alive: true }.to_json
   end
-  rescue StandardError => e
-    halt 500, {
-      error: e.inspect,
-      healthy: false,
-    }.to_json
 end

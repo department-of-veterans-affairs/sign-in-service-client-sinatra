@@ -4,3 +4,9 @@ require:
 
 AllCops:
   NewCops: disable
+
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
