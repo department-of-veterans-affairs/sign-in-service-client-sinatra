@@ -8,6 +8,7 @@ A sample app built with Sinatra that interfaces with Sign In Service (SiS).
 - Ruby 3.1.2
 
 ## Running the app
+### Native
 Setup the app:
 ```bash
 bin/setup
@@ -17,6 +18,18 @@ Start the server:
 bin/server
 ```
 By default the server will be running on http://localhost:4567
+
+### Docker
+Build image and start container
+```bash
+bin/up
+```
+The server will be running on http://localhost:4567
+
+Remove container and cleanup
+```bash
+bin/down
+```
 
 ## Development
 ### App Configuration
