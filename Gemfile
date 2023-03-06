@@ -5,6 +5,8 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}.git" }
 source 'https://rubygems.org'
 
 gem 'dotenv'
+gem 'faraday'
+gem 'httparty'
 gem 'puma'
 gem 'rake'
 gem 'sinatra'
