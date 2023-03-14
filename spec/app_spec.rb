@@ -3,6 +3,12 @@
 require 'spec_helper'
 
 RSpec.describe 'SiS Client App' do
+  include Rack::Test::Methods
+
+  def app
+    Sinatra::Application
+  end
+
   describe 'GET /' do
     it 'returns a 200 OK status' do
       get '/'
