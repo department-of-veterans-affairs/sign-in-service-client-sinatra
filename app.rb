@@ -19,13 +19,9 @@ set :session_secret, ENV.fetch('SESSION_SECRET', SecureRandom.hex(32))
 enable :sessions
 
 get '/' do
-  erb :login
-end
+  flash(:error, 'Sign in to access this page') if !current_user && @current_user.nil?
 
-get '/user' do
-  sis_response = SignInService.client.introspect(access_token: cookies[:vagov_access_token])
-
-  sis_response.body
+  erb :index
 end
 
 namespace '/auth' do
@@ -33,17 +29,19 @@ namespace '/auth' do
     pkce = Pkce.new
     session[:code_verifier] = pkce.code_verifier
 
-    uri = SignInService.client.authorize_uri(type: params[:type], acr: params[:acr],
-                                             code_challenge: pkce.code_challenge)
+    authorize_uri = SignInService.client.authorize_uri(type: params[:type], acr: params[:acr],
+                                                       code_challenge: pkce.code_challenge)
 
-    redirect to uri
+    redirect to authorize_uri
   end
 
   get '/result' do
     sis_response = SignInService.client.get_token(code: params[:code], code_verifier: session[:code_verifier])
 
     response.headers['set-cookie'] = parse_cookie_header(sis_response.headers['set-cookie'])
-    redirect '/user'
+    flash(:notice, 'You have successfully signed in')
+
+    redirect '/'
   end
 
   post '/refresh' do
@@ -55,14 +53,16 @@ namespace '/auth' do
     store_cookie_header(cookie_header: sis_response.headers['set-cookie'])
   end
 
-  get '/logout' do
+  post '/logout' do
     sis_response = SignInService.client.logout(access_token: cookies[:vagov_access_token],
                                                anti_csrf_token: cookies[:vagov_anti_csrf_token])
-    redirect sis_response.headers['location']
 
-    # TODO: move this to the logout callback once redirect proxy set up
-    # session.clear
-    # cookies.clear
+    redirect sis_response.headers['location'] if sis_response.status == 302
+
+    session.clear
+    cookies.clear
+
+    redirect to '/'
   end
 end
 
@@ -77,11 +77,74 @@ namespace '/api' do
 end
 
 helpers do
+  def current_user
+    @current_user ||= find_current_user
+  end
+
+  def find_current_user
+    session[:current_user] = if session[:current_user] && valid_access_token?
+                               session[:current_user]
+                             elsif valid_access_token?
+                               introspect
+                             else
+                               session.clear
+                               cookies.clear
+                               nil
+                             end
+  end
+
+  def introspect
+    return if cookies[:vagov_access_token].nil?
+    return session[:current_user] unless session[:current_user].nil?
+
+    sis_response = SignInService.client.introspect(access_token: cookies[:vagov_access_token])
+
+    JSON.parse(sis_response.body)['data']['attributes']
+  end
+
   def parse_cookie_header(cookie_header)
     cookie_header.split(/, (?=[^;]+=[^;]+;)/)
+  end
+
+  def flash(type, message)
+    session[:"flash_#{type}"] = message
+  end
+
+  def valid_access_token?
+    cookies[:vagov_access_token] && Time.now.utc < access_token_expiration
+  end
+
+  def valid_refresh_token?
+    return false if refresh_token_expiration.nil?
+
+    Time.now.utc < refresh_token_expiration
+  end
+
+  def access_token_expiration
+    @access_token_expiration ||= info_token&.fetch(:access_token_expiration)
+  end
+
+  def refresh_token_expiration
+    @refresh_token_expiration ||= info_token&.fetch(:refresh_token_expiration)
+  end
+
+  def info_token
+    @info_token ||= parse_info_token_cookie
+  end
+
+  def parse_info_token_cookie
+    return unless cookies[:vagov_info_token]
+
+    info_token = cookies[:vagov_info_token].gsub(
+      /\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2}\.\d{6}\d{3} \w{3} \+\d{2}:\d{2}/, &:dump
+    )
+    info_token_hash = eval(info_token.gsub(/(:\s*)?([a-zA-Z_]+)\s*=>/, '"\2":')) # rubocop:disable Security/Eval
+    info_token_hash.transform_values!(&Time.method(:parse))
   end
 end
 
 error SignInService::Error do
-  "Sign In Service Error: #{env['sinatra.error'].message}"
+  error_message = "Sign In Service Error: #{env['sinatra.error'].message}"
+  flash(:error, error_message)
+  erb :index
 end

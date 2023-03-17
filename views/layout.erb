@@ -1,17 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Sign In Service Sample App</title>
-     <script>
-        const baseUrl = '<%= ENV['SIS_BASE_URL'] %>'
-        const makeRequest = () => fetch(`${baseUrl}/v0/sign_in/refresh`, { method: 'POST', credentials: 'include' })
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link href="/assets/stylesheets/application.css" rel="stylesheet" type="text/css"">
+  <script>
+    <% if valid_refresh_token? %>
+      const baseUrl = '<%= ENV['SIS_BASE_URL'] %>'
+      const makeRequest = () => fetch(`${baseUrl}/v0/sign_in/refresh`, { method: 'POST', credentials: 'include' })
+      makeRequest()
+      setInterval(() => {
         makeRequest()
-        setInterval(() => {
-          if(document.cookie.includes('vagov_info_token')) makeRequest()
-        }, 1000 * 60 * 4)
-    </script>
-  </head>
-  <body>
-    <%= yield %>
-  </body>
+      }, 1000 * 60 * 4)
+    <% end %>
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+        const $notification = $delete.parentNode;
+
+        $delete.addEventListener('click', () => {
+          $notification.parentNode.removeChild($notification);
+        });
+      });
+    });
+    setTimeout(function() {
+      document.querySelectorAll('.notification').forEach(function(notification) {
+        notification.remove();
+      });
+    }, 5000);
+  </script>
+
+  <title>Sign In Service Sample App</title>
+</head>
+<body>
+  <nav class="navbar is-link" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        Sign In Service
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons">
+        <% if @current_user %>
+          <form method="post" action="/auth/logout">
+            <button class="button is-link is-light" type="submit">Sign out</button>
+          </form>
+        <% end %>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class='container hero is-fullheight'>
+    <% if session[:flash_notice]  %>
+      <div class="notification is-success is-light">
+        <button class="delete"></button>
+        <%= session.delete(:flash_notice) %>
+      </div>
+    <% elsif session[:flash_error] %>
+      <div class="notification is-danger is-light">
+        <button class="delete"></button>
+        <%= session.delete(:flash_error) %>
+      </div>
+    <% end %>
+
+    <section class="section">
+      <div class="container">
+        <%= yield %>
+      </div>
+    </section>
+
+    <footer class="footer mt-auto">
+      <div class="content has-text-centered">
+      </div>
+    </footer>
+  </div>
+</body>
 </html>

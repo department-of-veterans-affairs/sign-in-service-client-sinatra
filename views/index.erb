@@ -1,0 +1,27 @@
+<% if @current_user %>
+  <%= @current_user %>
+<% else %>
+  <div class="columns is-mobile is-centered">
+    <div class="column is-half">
+      <form method="post" action="/auth/request">
+        <input type="hidden" name="type" value="idme">
+        <input type="hidden" name="acr" value="loa3">
+        <div class="control">
+          <button class="button is-info is-fullwidth">Sign in with Id.me</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="columns is-mobile is-centered">
+    <div class="column is-half">
+      <form method="post" action="/auth/request">
+        <input type="hidden" name="type" value="logingov">
+        <input type="hidden" name="acr" value="ial2">
+        <div class="control">
+          <button class="button is-danger is-fullwidth">Sign in with Login.gov</button>
+        </div>
+      </form>
+    </div>
+  </div>
+<% end %>

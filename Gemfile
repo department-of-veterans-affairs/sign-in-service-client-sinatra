@@ -6,7 +6,6 @@ source 'https://rubygems.org'
 
 gem 'dotenv'
 gem 'faraday'
-gem 'httparty'
 gem 'puma'
 gem 'rake'
 gem 'sinatra'
