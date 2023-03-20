@@ -57,11 +57,18 @@ namespace '/auth' do
     sis_response = SignInService.client.logout(access_token: cookies[:vagov_access_token],
                                                anti_csrf_token: cookies[:vagov_anti_csrf_token])
 
-    redirect sis_response.headers['location'] if sis_response.status == 302
+    redirect to sis_response.headers['location'] if sis_response.status == 302
 
-    session.clear
-    cookies.clear
+    clear_session
 
+    flash(:notice, 'You have successfully signed out')
+    redirect to '/'
+  end
+
+  get '/logout_callback' do
+    clear_session
+
+    flash(:notice, 'You have successfully signed out')
     redirect to '/'
   end
 end
@@ -87,8 +94,7 @@ helpers do
                              elsif valid_access_token?
                                introspect
                              else
-                               session.clear
-                               cookies.clear
+                               clear_session
                                nil
                              end
   end
@@ -107,6 +113,8 @@ helpers do
   end
 
   def flash(type, message)
+    return unless session[:flash_error].nil? && session[:flash_notice].nil?
+
     session[:"flash_#{type}"] = message
   end
 
@@ -132,6 +140,7 @@ helpers do
     @info_token ||= parse_info_token_cookie
   end
 
+  # TODO: Replae this once the cookie value is changed to a JSON object
   def parse_info_token_cookie
     return unless cookies[:vagov_info_token]
 
@@ -140,6 +149,15 @@ helpers do
     )
     info_token_hash = eval(info_token.gsub(/(:\s*)?([a-zA-Z_]+)\s*=>/, '"\2":')) # rubocop:disable Security/Eval
     info_token_hash.transform_values!(&Time.method(:parse))
+  end
+
+  def clear_session
+    session.delete(:current_user)
+    session.delete(:code_verifier)
+    cookies.delete(:vagov_access_token)
+    cookies.delete(:vagov_refresh_token)
+    cookies.delete(:vagov_anti_csrf_token)
+    cookies.delete(:vagov_info_token)
   end
 end
 
