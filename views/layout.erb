@@ -33,6 +33,21 @@
     }, 5000);
   </script>
 
+  <script>
+    function toggleSensitiveInfo(id) {
+      const element = document.getElementById(id);
+      const button = document.getElementById(id + '-btn');
+
+      if (element.style.display === 'none') {
+        element.style.display = 'inline';
+        button.textContent = 'Hide';
+      } else {
+        element.style.display = 'none';
+        button.textContent = 'Reveal';
+      }
+    }
+  </script>
+
   <title>Sign In Service Sample App</title>
 </head>
 <body>

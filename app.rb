@@ -105,7 +105,7 @@ helpers do
 
     sis_response = SignInService.client.introspect(access_token: cookies[:vagov_access_token])
 
-    JSON.parse(sis_response.body)['data']['attributes']
+    JSON.parse(sis_response.body, symbolize_names: true)[:data][:attributes]
   end
 
   def parse_cookie_header(cookie_header)
@@ -116,6 +116,14 @@ helpers do
     return unless session[:flash_error].nil? && session[:flash_notice].nil?
 
     session[:"flash_#{type}"] = message
+  end
+
+  def cookie_auth?
+    SignInService.client.cookie_auth?
+  end
+
+  def api_auth?
+    SignInService.client.api_auth?
   end
 
   def valid_access_token?
