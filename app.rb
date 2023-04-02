@@ -3,6 +3,7 @@
 require 'dotenv/load'
 require 'logger'
 require 'pkce'
+require 'jwt'
 require 'sign_in_service'
 require 'sinatra'
 require 'sinatra/custom_logger'
@@ -16,8 +17,9 @@ set :erb, escape_html: true
 set :logger, Logger.new($stdout)
 set :show_exceptions, :after_handler
 
-set :session_secret, ENV.fetch('SESSION_SECRET', SecureRandom.hex(32))
-enable :sessions
+use Rack::Session::Cookie, key: 'rack.session',
+                           path: '/',
+                           secret: ENV.fetch('SESSION_SECRET', SecureRandom.hex(32))
 
 get '/' do
   flash[:error] = 'Sign in to access this page' if current_user.nil?
