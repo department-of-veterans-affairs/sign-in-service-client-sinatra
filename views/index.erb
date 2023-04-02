@@ -1,6 +1,6 @@
 <% if @current_user %>
   <div class="columns is-centered">
-    <div class="column is-half">
+    <div class="column">
       <div class="card">
         <header class="card-header">
           <p class="card-header-title">Account Information</p>
@@ -36,6 +36,21 @@
             <p><strong>ID Theft Flag:</strong> <%= @current_user[:id_theft_flag] ? 'Yes' : 'No' %></p>
             <p><strong>Verified:</strong> <%= @current_user[:verified] ? 'Yes' : 'No' %></p>
             <p><strong>Login.gov UUID:</strong> <%= @current_user[:logingov_uuid] %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">Session Information</p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <p><strong>Access Token Expiration:</strong> <%= access_token_expiration %></p>
+            <% if cookie_auth? %>
+              <p><strong>Refresh Token Expiration:</strong> <%= refresh_token_expiration %></p>
+            <% end %>
           </div>
         </div>
       </div>

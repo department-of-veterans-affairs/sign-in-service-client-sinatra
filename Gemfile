@@ -6,6 +6,7 @@ source 'https://rubygems.org'
 
 gem 'dotenv'
 gem 'faraday'
+gem 'jwt'
 gem 'puma'
 gem 'rake'
 gem 'sinatra'

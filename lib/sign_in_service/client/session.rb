@@ -59,8 +59,8 @@ module SignInService
           if cookie_auth?
             req.headers = cookie_header({ refresh_token:, anti_csrf_token: })
           else
-            req.params[:refresh_token] = CGI.escape(refresh_token)
-            req.params[:anti_csrf_token] = CGI.escape(anti_csrf_token)
+            req.params[:refresh_token] = refresh_token
+            req.params[:anti_csrf_token] = anti_csrf_token if anti_csrf_token
           end
         end
       end

@@ -76,15 +76,15 @@
     </div>
   </nav>
   <div class='container hero is-fullheight'>
-    <% if session[:flash_notice]  %>
+    <% if message = flash[:notice]  %>
       <div class="notification is-success is-light">
         <button class="delete"></button>
-        <%= session.delete(:flash_notice) %>
+        <%= message %>
       </div>
-    <% elsif session[:flash_error] %>
+    <% elsif message = flash[:error] %>
       <div class="notification is-danger is-light">
         <button class="delete"></button>
-        <%= session.delete(:flash_error) %>
+        <%= message %>
       </div>
     <% end %>
 
