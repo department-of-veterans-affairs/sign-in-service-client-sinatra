@@ -21,6 +21,10 @@ use Rack::Session::Cookie, key: 'rack.session',
                            path: '/',
                            secret: ENV.fetch('SESSION_SECRET', SecureRandom.hex(32))
 
+before '/' do
+  refresh_api_session if api_auth?
+end
+
 get '/' do
   flash[:error] = 'Sign in to access this page' if current_user.nil?
 
@@ -155,7 +159,7 @@ helpers do
   end
 
   def refresh_api_session
-    return if refresh_token.nil?
+    return unless api_auth? && refresh_token
 
     sis_response = SignInService.client.refresh_token(refresh_token:, anti_csrf_token:)
 
