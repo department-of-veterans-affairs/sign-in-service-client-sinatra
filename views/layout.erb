@@ -6,8 +6,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link href="/assets/stylesheets/application.css" rel="stylesheet" type="text/css"">
   <script>
-    <% if valid_refresh_token? %>
-      const baseUrl = '<%= ENV['SIS_BASE_URL'] %>'
+    <% if @refreshable %>
+      const baseUrl = '<%= @sis_base_url %>'
       const makeRequest = () => fetch(`${baseUrl}/v0/sign_in/refresh`, { method: 'POST', credentials: 'include' })
       makeRequest()
       setInterval(() => {

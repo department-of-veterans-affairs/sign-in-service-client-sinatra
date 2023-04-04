@@ -47,9 +47,10 @@
         </header>
         <div class="card-content">
           <div class="content">
-            <p><strong>Access Token Expiration:</strong> <%= access_token_expiration %></p>
+            <p><strong>Auth Type:</strong> <%= @auth_type %></p>
+            <p><strong>Access Token Expiration:</strong> <%= @access_token_expiration %></p>
             <% if cookie_auth? %>
-              <p><strong>Refresh Token Expiration:</strong> <%= refresh_token_expiration %></p>
+              <p><strong>Refresh Token Expiration:</strong> <%= @refresh_token_expiration %></p>
             <% end %>
           </div>
         </div>

@@ -26,7 +26,17 @@ before '/' do
 end
 
 get '/' do
-  flash[:error] = 'Sign in to access this page' if current_user.nil?
+  @current_user = find_current_user
+
+  if @current_user.nil?
+    flash[:error] = 'Sign in to access this page'
+  else
+    @refreshable = valid_refresh_token?
+    @sis_base_url = SignInService.config.base_url
+    @auth_type = SignInService.config.auth_type
+    @access_token_expiration = access_token_expiration
+    @refresh_token_expiration = refresh_token_expiration
+  end
 
   erb :index
 end
@@ -77,15 +87,15 @@ namespace '/api' do
 end
 
 helpers do
-  def current_user
-    @current_user = session[:current_user] ||= if session[:current_user] && valid_access_token?
-                                                 session[:current_user]
-                                               elsif valid_access_token?
-                                                 introspect
-                                               else
-                                                 clear_session
-                                                 nil
-                                               end
+  def find_current_user
+    session[:current_user] ||= if session[:current_user] && valid_access_token?
+                                 session[:current_user]
+                               elsif valid_access_token?
+                                 introspect
+                               else
+                                 clear_session
+                                 nil
+                               end
   end
 
   def introspect
@@ -98,7 +108,7 @@ helpers do
     if cookie_auth?
       cookies[:vagov_access_token]
     else
-      session[:vagov_access_token]
+      session[:access_token]
     end
   end
 
@@ -106,7 +116,7 @@ helpers do
     if cookie_auth?
       cookies[:vagov_refresh_token]
     else
-      session[:vagov_refresh_token]
+      session[:refresh_token]
     end
   end
 
@@ -114,7 +124,7 @@ helpers do
     if cookie_auth?
       cookies[:vagov_anti_csrf_token]
     else
-      session[:vagov_anti_csrf_token]
+      session[:anti_csrf_token]
     end
   end
 
@@ -171,8 +181,8 @@ helpers do
       response.headers['set-cookie'] = parse_cookie_header(sis_response.headers['set-cookie'])
     else
       body = JSON.parse(sis_response.body, symbolize_names: true)[:data]
-      session[:vagov_access_token] = body[:access_token]
-      session[:vagov_refresh_token] = body[:refresh_token]
+      session[:access_token] = body[:access_token]
+      session[:refresh_token] = body[:refresh_token]
     end
   end
 
@@ -181,15 +191,8 @@ helpers do
   end
 
   def clear_session
-    session.delete(:current_user)
-    session.delete(:code_verifier)
-    session.delete(:vagov_access_token)
-    session.delete(:vagov_refresh_token)
-    session.delete(:vagov_anti_csrf_token)
-    cookies.delete(:vagov_access_token)
-    cookies.delete(:vagov_refresh_token)
-    cookies.delete(:vagov_anti_csrf_token)
-    cookies.delete(:vagov_info_token)
+    session.clear
+    cookies.clear
   end
 end
 
