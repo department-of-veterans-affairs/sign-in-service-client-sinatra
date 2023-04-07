@@ -1,0 +1,84 @@
+<% if @current_user %>
+  <div class="columns is-centered">
+    <div class="column">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">Account Information</p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <p><strong>UUID:</strong> <%= @current_user[:uuid] %></p>
+            <p><strong>Name:</strong> <%= @current_user[:first_name] %> <%= @current_user[:middle_name] %> <%= @current_user[:last_name] %></p>
+            <p><strong>Birth Date:</strong> <%= @current_user[:birth_date] %></p>
+            <p><strong>Email:</strong> <%= @current_user[:email] %></p>
+            <p><strong>Gender:</strong> <%= @current_user[:gender] %></p>
+            <p>
+              <strong>SSN:</strong>
+              <span id="ssn" style="display: none;"><%= @current_user[:ssn] %></span>
+              <button id="ssn-btn" class="button is-small" onclick="toggleSensitiveInfo('ssn')">Reveal</button>
+            </p>
+            <p><strong>BIRLS ID:</strong> <%= @current_user[:birls_id] %></p>
+            <p><strong>Authn Context:</strong> <%= @current_user[:authn_context] %></p>
+            <p>
+              <strong>ICN:</strong>
+              <span id="icn" style="display: none;"><%= @current_user[:icn] %></span>
+              <button id="icn-btn" class="button is-small" onclick="toggleSensitiveInfo('icn')">Reveal</button>
+            </p>
+            <p><strong>EDIPI:</strong> <%= @current_user[:edipi] %></p>
+            <p><strong>Active MHV IDs:</strong> <%= @current_user[:active_mhv_ids].join(', ') %></p>
+            <p><strong>SEC ID:</strong> <%= @current_user[:sec_id] %></p>
+            <p><strong>Vet360 ID:</strong> <%= @current_user[:vet360_id] %></p>
+            <p><strong>Participant ID:</strong> <%= @current_user[:participant_id] %></p>
+            <p><strong>Cerner ID:</strong> <%= @current_user[:cerner_id] %></p>
+            <p><strong>Cerner Facility IDs:</strong> <%= @current_user[:cerner_facility_ids].join(', ') %></p>
+            <p><strong>ID.me UUID:</strong> <%= @current_user[:idme_uuid] %></p>
+            <p><strong>VHA Facility IDs:</strong> <%= @current_user[:vha_facility_ids].join(', ') %></p>
+            <p><strong>ID Theft Flag:</strong> <%= @current_user[:id_theft_flag] ? 'Yes' : 'No' %></p>
+            <p><strong>Verified:</strong> <%= @current_user[:verified] ? 'Yes' : 'No' %></p>
+            <p><strong>Login.gov UUID:</strong> <%= @current_user[:logingov_uuid] %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">Session Information</p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <p><strong>Auth Type:</strong> <%= @auth_type %></p>
+            <p><strong>Access Token Expiration:</strong> <%= @access_token_expiration %></p>
+            <% if cookie_auth? %>
+              <p><strong>Refresh Token Expiration:</strong> <%= @refresh_token_expiration %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="columns is-mobile is-centered">
+    <div class="column is-half">
+      <form method="post" action="/auth/request">
+        <input type="hidden" name="type" value="idme">
+        <input type="hidden" name="acr" value="loa3">
+        <div class="control">
+          <button class="button is-info is-fullwidth">Sign in with Id.me</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="columns is-mobile is-centered">
+    <div class="column is-half">
+      <form method="post" action="/auth/request">
+        <input type="hidden" name="type" value="logingov">
+        <input type="hidden" name="acr" value="ial2">
+        <div class="control">
+          <button class="button is-danger is-fullwidth">Sign in with Login.gov</button>
+        </div>
+      </form>
+    </div>
+  </div>
+<% end %>
