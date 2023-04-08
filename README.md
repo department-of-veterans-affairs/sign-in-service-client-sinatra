@@ -5,7 +5,7 @@
 A sample app built with Sinatra that interfaces with Sign In Service (SiS).
 
 ## Dependencies
-- Ruby 3.1.2
+- Ruby 3.2.1
 
 ## Configuration
 ### Config the SiS Server
