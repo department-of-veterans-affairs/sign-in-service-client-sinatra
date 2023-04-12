@@ -1,9 +1,51 @@
-body { height: 100vh; }
+body {
+	overflow-y: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: space-between;
+	background: white;
+	height: 100vh;
+	/* color: 	background-color: #112e51; ; */
+	/* border: solid red; */
+}
 
 .notification {
-  position: fixed;
-  top: 1%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
+	position: fixed;
+	top: 1%;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 9999;
+	/* border: solid red; */
+}
+
+.va-header-logo {
+	width: 100%;
+	max-width: 264px;
+	height: auto;
+	border: solid red;
+}
+
+.navbar {
+	min-height: 167.19px;
+	background-color: #112e51;
+	/* display: flex; */
+	color: white;
+	/* border: solid red; */
+}
+
+.container.hero {
+	border: solid dodgerblue;
+	flex-grow: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	margin: auto;
+}
+
+.section .container {
+	border: solid green;
+	display: flex;
+	flex-direction: column;
 }
