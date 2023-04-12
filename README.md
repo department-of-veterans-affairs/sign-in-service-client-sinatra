@@ -1,14 +1,14 @@
 **Note:** This repo is managed by the VSP-Identity team. Please reference our main product page [here](https://github.com/department-of-veterans-affairs/va.gov-team/blob/master/products/identity/README.md) for contact information and questions.
 
-# Sign In Service Sample App
+# Sign-in Service Example App
 
-A sample app built with Sinatra that interfaces with Sign In Service.
+An example app built with Sinatra that interfaces with Sign-in Service.
 
 ## Dependencies
 - Ruby 3.2.1
 
 ## Configuration
-### Config the SignInService Server
+### Config the Sign-in Service Server
 Currently, SignInService is available as a part of `vets-api`
 1. Clone Repo
   ```bash
@@ -50,7 +50,7 @@ the correct client and auth_type.
   vets-api % rails s
 ```
 
-## Running the Sample app
+## Running the Example app
 ### Native
 Setup the app:
 ```bash
