@@ -45,7 +45,7 @@ the correct client and auth_type.
     config.auth_type = ENV.fetch('SIS_AUTH_TYPE').to_sym
   end
 ```
-3. Start the `SiS` server (`vets-api`)
+3. Start the Sign-in Service server (`vets-api`)
 ```bash
   vets-api % rails s
 ```
