@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'dotenv/load'
 require 'logger'
 require 'pkce'
 require 'jwt'
@@ -43,17 +42,25 @@ end
 
 namespace '/auth' do
   post '/request' do
-    pkce = Pkce.new
-    session[:code_verifier] = pkce.code_verifier
+    if SignInService.client.auth_flow == SignInService::PKCE_FLOW
+      pkce = Pkce.new
+      session[:code_verifier] = pkce.code_verifier
+      code_challenge = pkce.code_challenge
+    end
 
-    authorize_uri = SignInService.client.authorize_uri(type: params[:type], acr: params[:acr],
-                                                       code_challenge: pkce.code_challenge)
+    authorize_uri = SignInService.client.authorize_uri(type: params[:type], acr: params[:acr], code_challenge:)
 
     redirect to authorize_uri
   end
 
   get '/result' do
-    sis_response = SignInService.client.get_token(code: params[:code], code_verifier: session[:code_verifier])
+    if SignInService.client.auth_flow == SignInService::JWT_FLOW
+      client_assertion = new_encoded_jwt
+    else
+      code_verifier = session[:code_verifier]
+    end
+
+    sis_response = SignInService.client.get_token(code: params[:code], code_verifier:, client_assertion:)
 
     store_tokens(sis_response)
 
@@ -193,6 +200,18 @@ helpers do
   def clear_session
     session.clear
     cookies.clear
+  end
+
+  def new_encoded_jwt
+    payload = {
+      iss: ENV.fetch('SIS_CLIENT_ID'),
+      aud: '127.0.0.1:3000/v0/sign_in/token',
+      sub: ENV.fetch('SIS_CLIENT_ID'),
+      jti: SecureRandom.hex,
+      exp: DateTime.now.next_day(30).strftime('%s').to_i
+    }
+
+    JWT.encode(payload, OpenSSL::PKey::RSA.new(File.read('sample_client.pem')), 'RS256')
   end
 end
 
