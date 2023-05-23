@@ -23,7 +23,7 @@ This application uses the [SignInService Ruby Client](docs/sign_in_service_ruby_
 1. You will see the base config in `.env` (these match the default client config in `vets-api`)
 ```bash
   # .env
-  SIS_CLIENT_ID='sample_client_web'
+  SIS_CLIENT_ID='cookie_template'
   SIS_BASE_URL='http://localhost:3000'
   SIS_AUTH_TYPE='cookie'
 ```
@@ -31,7 +31,7 @@ This application uses the [SignInService Ruby Client](docs/sign_in_service_ruby_
 the correct client and auth_type.
 ```bash
   # .env.local
-  SIS_CLIENT_ID='sample_client_api'
+  SIS_CLIENT_ID='api_template'
   SIS_BASE_URL='http://localhost:3000'
   SIS_AUTH_TYPE='api'
 ```
