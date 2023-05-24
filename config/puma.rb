@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'dotenv/load'
+require 'dotenv'
+Dotenv.load('.env.local', '.env')
 
 threads_count = ENV.fetch('PUMA_THREADS', 5).to_i
 
