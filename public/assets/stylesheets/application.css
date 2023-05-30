@@ -7,7 +7,17 @@ body {
 	background: white;
 	height: 100vh;
 	/* color: 	background-color: #112e51; ; */
-	/* border: solid red; */
+	border: solid red;
+	background: red;
+}
+
+a {
+	text-decoration: none;
+	color: orange;
+}
+
+.control {
+	border: solid orange;
 }
 
 .notification {
@@ -34,6 +44,23 @@ body {
 	/* border: solid red; */
 }
 
+.navbar-item {
+	color: white;
+	border: solid red;
+}
+
+.button {
+	width: 100%;
+}
+
+.idme {
+	height: max-content;
+	background-color: #2e8540;
+}
+.loginGov {
+	background-color: #e31c3d;
+}
+
 .container.hero {
 	border: solid dodgerblue;
 	flex-grow: 2;
@@ -42,10 +69,24 @@ body {
 	justify-content: center;
 	flex-direction: column;
 	margin: auto;
+	width: 100%;
 }
 
 .section .container {
-	border: solid green;
+	border: solid pink;
 	display: flex;
 	flex-direction: column;
+	align-items: center;
+	padding: 15px;
+	height: 100%;
+}
+
+.svg {
+	max-height: 15px;
+}
+
+button {
+	margin: 0 auto;
+	width: 100%;
+	padding: 10px;
 }
