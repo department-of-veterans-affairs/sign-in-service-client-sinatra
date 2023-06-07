@@ -10,6 +10,7 @@ require 'sinatra/namespace'
 require 'sinatra/cookies'
 require 'sinatra/cookie_header_helper'
 require 'sinatra/flash_helper'
+require 'sinatra/reloader' if development?
 require 'pry' if development?
 
 set :erb, escape_html: true
