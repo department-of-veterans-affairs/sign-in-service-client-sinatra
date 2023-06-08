@@ -1,3 +1,7 @@
+* {
+	box-sizing: border-box;
+}
+
 body {
 	overflow-y: hidden;
 	display: flex;
@@ -6,9 +10,6 @@ body {
 	align-items: space-between;
 	background: white;
 	height: 100vh;
-	/* color: 	background-color: #112e51; ; */
-	border: solid red;
-	background: red;
 }
 
 a {
@@ -16,8 +17,65 @@ a {
 	color: orange;
 }
 
+h2 {
+	margin: 0;
+}
+
+.va-header-logo {
+	width: 100%;
+	height: auto;
+}
+
+.header {
+	min-height: 167.19px;
+	background-color: #112e51;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.navbar {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	width: 70vw;
+	max-width: 1000px;
+	/* border: solid pink; */
+}
+
+.navbar-item {
+	margin: 0 auto;
+	color: white;
+	height: auto;
+	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.sample-app {
+	font-size: medium;
+	font-weight: 400;
+}
+
+.sign-in-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	/* border: solid; */
+	padding: 1vh;
+	max-width: 1000px;
+	margin: 0 auto;
+	width: 70vw;
+}
+
 .control {
-	border: solid orange;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	/* border: solid; */
+	/* margin: .5vh 0; */
 }
 
 .notification {
@@ -26,43 +84,35 @@ a {
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 9999;
-	/* border: solid red; */
-}
-
-.va-header-logo {
-	width: 100%;
-	max-width: 264px;
-	height: auto;
-	border: solid red;
-}
-
-.navbar {
-	min-height: 167.19px;
-	background-color: #112e51;
-	/* display: flex; */
-	color: white;
-	/* border: solid red; */
-}
-
-.navbar-item {
-	color: white;
-	border: solid red;
 }
 
 .button {
 	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	max-width: 330px;
+	padding: 0.75em;
+	font-size: 16px;
+	margin: 1em 0;
 }
 
 .idme {
 	height: max-content;
 	background-color: #2e8540;
 }
+
 .loginGov {
 	background-color: #e31c3d;
 }
 
+.columns {
+	margin: 0;
+	padding: 0;
+}
+
 .container.hero {
-	border: solid dodgerblue;
 	flex-grow: 2;
 	display: flex;
 	align-items: center;
@@ -72,21 +122,63 @@ a {
 	width: 100%;
 }
 
-.section .container {
-	border: solid pink;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 15px;
-	height: 100%;
+.section {
+	width: 100%;
+	padding: 15vh;
 }
 
-.svg {
-	max-height: 15px;
+@media (max-width: 650px) {
+	.section {
+		padding: 10%;
+	}
+
+	.navbar {
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	h2,
+	img {
+		margin: 0 auto;
+	}
+	.va-header-logo {
+		width: 100%;
+		display: flex;
+		flex-direction: center;
+	}
+}
+
+.section .container {
+	display: flex;
+	flex-direction: column;
+	height: 60vh;
+	width: 100%;
 }
 
 button {
-	margin: 0 auto;
 	width: 100%;
 	padding: 10px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	width: 100%;
+	max-width: 330px;
+	padding: 0.75em;
+	font-size: 16px;
+	margin: 1em 0;
+	white-space: normal !important;
+}
+
+.usa-button {
+	width: 100%;
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 0;
+	padding-right: 0;
+	display: block;
+	text-align: center;
+}
+
+.notification.is-danger {
 }
