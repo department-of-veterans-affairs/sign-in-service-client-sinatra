@@ -3,7 +3,7 @@
 }
 
 body {
-	overflow-y: hidden;
+	overflow-y: scroll;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -21,6 +21,11 @@ h2 {
 	margin: 0;
 }
 
+svg {
+	width: 60%;
+	max-height: 20px;
+}
+
 .va-header-logo {
 	width: 100%;
 	height: auto;
@@ -36,36 +41,37 @@ h2 {
 
 .navbar {
 	display: flex;
-	justify-content: space-around;
+	justify-content: space-between;
 	align-items: center;
 	width: 70vw;
 	max-width: 1000px;
-	/* border: solid pink; */
 }
 
 .navbar-item {
-	margin: 0 auto;
+	/* margin: 0 auto; */
 	color: white;
 	height: auto;
-	width: 100%;
+	width: auto;
 	display: flex;
+	flex-direction: column;
 	justify-content: flex-end;
-	align-items: center;
+	align-items: flex-end;
 }
 
 .sample-app {
 	font-size: medium;
 	font-weight: 400;
+	text-align: end;
 }
 
 .sign-in-wrapper {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	/* border: solid; */
+	align-items: center;
 	padding: 1vh;
 	max-width: 1000px;
-	margin: 0 auto;
+	margin: 10vh auto;
 	width: 70vw;
 }
 
@@ -73,17 +79,20 @@ h2 {
 	width: 100%;
 	display: flex;
 	align-items: center;
-	justify-content: flex-start;
+	justify-content: center;
+	margin: 0 auto;
 	/* border: solid; */
 	/* margin: .5vh 0; */
 }
 
 .notification {
 	position: fixed;
-	top: 1%;
+	top: 5%;
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 9999;
+	text-align: center;
+	width: auto !important;
 }
 
 .button {
@@ -103,13 +112,25 @@ h2 {
 	background-color: #2e8540;
 }
 
+.usa-button.idme:active,
+.usa-button.idme:hover {
+	background-color: #305f39;
+}
+
 .loginGov {
 	background-color: #e31c3d;
 }
 
+.usa-button.loginGov:active,
+.usa-button.loginGov:hover{
+	background-color: #ae1c34;
+}
+
 .columns {
-	margin: 0;
+	margin: 0 auto;
 	padding: 0;
+
+	max-width: 1000px;
 }
 
 .container.hero {
@@ -124,7 +145,33 @@ h2 {
 
 .section {
 	width: 100%;
-	padding: 15vh;
+	height: 100%;
+	padding: 0 15vh;
+}
+
+.card {
+	overflow-y: scroll;
+	max-height: 50vh;
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
 }
 
 @media (max-width: 650px) {
@@ -136,9 +183,18 @@ h2 {
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		width: 100%;
+		padding: 10%;
 	}
 
-	h2,
+	.navbar-item {
+		flex-direction: row;
+		width: 100%;
+		padding: 0;
+		justify-content: space-between;
+		align-items: center;
+	}
+	/* h2, */
 	img {
 		margin: 0 auto;
 	}
@@ -180,5 +236,9 @@ button {
 	text-align: center;
 }
 
-.notification.is-danger {
-}
+/* .nav-column {
+	background-color: purple;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex end;
+} */

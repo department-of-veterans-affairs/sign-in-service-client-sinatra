@@ -9,36 +9,39 @@
 </head>
 <body>
 <header class="header">
+
 <nav class="navbar" role="navigation" aria-label="main navigation">
-<div class="navbar-item"> 
+  <div class="navbar-item"> 
     <a class="va-header-logo" href="/" > 
- <img src='/assets/img/header-logo.png' alt="VA logo and Seal, U.S. Department of Veterans Affairs" height="59" width="264">
+      <img src='/assets/img/header-logo.png' alt="VA logo and Seal, U.S. Department of Veterans Affairs" height="59" width="264">
     </a>
-</div>
-  <div class="navbar-item">
-  <h2 class="sample-app">Sign In Service Sample App</h2>
-  <div class="navbar-end">
-        <div class="buttons">
-        <% if @current_user %>
-          <form method="post" action="/auth/logout">
-            <button class="" type="submit">Sign out</button>
-          </form>
-        <% end %>
-        </div>
-    </div></div>
+  </div>
+  <div class="navbar-item nav-column">
+    <div> 
+      <h2 class="sample-app">Sign In Service Sample App</h2>
+    </div>
+  
+    <div>
+      <% if @current_user %>
+        <form method="post" action="/auth/logout">
+          <button class="" type="submit">Sign out</button>
+        </form>
+      <% end %>
+    </div>
+  </div>  
 </nav>  
 </header>
 
   <div class='container hero is-fullheight'>
     <% if message = flash[:notice]  %>
-      <div class="notification is-success is-light">
-        <button class="delete"></button>
-        <%= message %>
+      <div class="notification button is-success is-light">
+        <button class="delete"> <%= message %></button>
+       
       </div>
     <% elsif message = flash[:error] %>
-      <div class="notification is-danger is-light">
-        <button class="delete"></button>
-        <%= message %>
+      <div class="notification button is-danger is-light">
+        <button class="delete"> <%= message %></button>
+       
       </div>
     <% end %>
 
