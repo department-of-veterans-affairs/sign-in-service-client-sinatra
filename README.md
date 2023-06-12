@@ -1,15 +1,16 @@
 **Note:** This repo is managed by the VSP-Identity team. Please reference our main product page [here](https://github.com/department-of-veterans-affairs/va.gov-team/blob/master/products/identity/README.md) for contact information and questions.
 
-# Sign In Service (SiS) Sample App
+# Sign-in Service Example App
 
-A sample app built with Sinatra that interfaces with Sign In Service (SiS).
+An example app built with Sinatra that interfaces with Sign-in Service.
 
 ## Dependencies
-- Ruby 3.1.2
+- Ruby 3.2.1
 
 ## Configuration
-### Config the SiS Server
-Currently, SiS is available as a part of `vets-api`
+### Config the Sign-in Service Server
+Currently, SignInService is available as a part of `vets-api`
+
 1. Clone Repo
   ```bash
     git clone git@github.com:department-of-veterans-affairs/vets-api.git
@@ -17,7 +18,8 @@ Currently, SiS is available as a part of `vets-api`
 2. Follow [setup instructions](git@github.com:department-of-veterans-affairs/vets-api.git) for vets-api
 3. Ensure your database is prpoerly seeded `rails db:seed` this will add the necessary client configurations
 
-### Configure the SiS client
+
+### Configure the SignInService client
 This application uses the [SignInService Ruby Client](docs/sign_in_service_ruby_client.md)
 
 1. You will see the base config in `.env` (these match the default client config in `vets-api`)
@@ -45,12 +47,14 @@ the correct client and auth_type.
     config.auth_type = ENV.fetch('SIS_AUTH_TYPE').to_sym
   end
 ```
-3. Start the `SiS` server (`vets-api`)
+
+3. Start the Sign-in Service server (`vets-api`)
 ```bash
   vets-api % rails s
 ```
 
-## Running the Sample app
+
+## Running the Example app
 ### Native
 Setup the app:
 ```bash

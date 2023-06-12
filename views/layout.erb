@@ -59,6 +59,7 @@
 
 
    <script>
+
     <% if @refreshable %>
       const baseUrl = '<%= @sis_base_url %>'
       const makeRequest = () => fetch(`${baseUrl}/v0/sign_in/refresh`, { method: 'POST', credentials: 'include' })
@@ -100,7 +101,5 @@
       }
     }
   </script>
-
-
 </body>
 </html>

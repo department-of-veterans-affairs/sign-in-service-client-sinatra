@@ -48,7 +48,6 @@ svg {
 }
 
 .navbar-item {
-	/* margin: 0 auto; */
 	color: white;
 	height: auto;
 	width: auto;
@@ -81,8 +80,6 @@ svg {
 	align-items: center;
 	justify-content: center;
 	margin: 0 auto;
-	/* border: solid; */
-	/* margin: .5vh 0; */
 }
 
 .notification {
@@ -194,7 +191,6 @@ svg {
 		justify-content: space-between;
 		align-items: center;
 	}
-	/* h2, */
 	img {
 		margin: 0 auto;
 	}
@@ -235,10 +231,3 @@ button {
 	display: block;
 	text-align: center;
 }
-
-/* .nav-column {
-	background-color: purple;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex end;
-} */

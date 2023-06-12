@@ -35,7 +35,7 @@
             <p><strong>VHA Facility IDs:</strong> <%= @current_user[:vha_facility_ids].join(', ') %></p>
             <p><strong>ID Theft Flag:</strong> <%= @current_user[:id_theft_flag] ? 'Yes' : 'No' %></p>
             <p><strong>Verified:</strong> <%= @current_user[:verified] ? 'Yes' : 'No' %></p>
-            <p><strong>Login.gov  UUID:</strong> <%= @current_user[:logingov_uuid] %></p>
+            <p><strong>Login.gov UUID:</strong> <%= @current_user[:logingov_uuid] %></p>
           </div>
         </div>
       </div>
@@ -93,11 +93,12 @@
       </button>
        </form>
     </div>
+
     </div>
   </div>
 
   <div class="columns is-mobile is-centered">
-    <div class="">
+    <div>
       <form method="post" action="/auth/request">
         <input type="hidden" name="type" value="logingov">
         <input type="hidden" name="acr" value="ial2">

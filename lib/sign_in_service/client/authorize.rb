@@ -18,7 +18,8 @@ module SignInService
       # @return [String] URI to authorize client
       #
 
-      def authorize_uri(type:, acr:, code_challenge:, state: nil)
+
+      def authorize_uri(type:, acr:, code_challenge: nil, state: nil)
         uri = URI.join(base_url, AUTHORIZE_PATH)
         params = {
           type:,
@@ -27,7 +28,8 @@ module SignInService
           code_challenge_method:,
           client_id:,
           state:
-        }
+
+        }.compact
 
         uri.query = URI.encode_www_form(params)
 
@@ -51,9 +53,10 @@ module SignInService
           acr:,
           code_challenge:,
           code_challenge_method:,
-          client_id:
-        }
-        params[:state] = state unless state.nil?
+          client_id:,
+          state:
+        }.compact
+
         connection.get(AUTHORIZE_PATH, params)
       end
 
@@ -65,12 +68,17 @@ module SignInService
       #
       # @return [Faraday::Response] Response with tokens in header or body
       #
-      def get_token(code:, code_verifier:)
+
+      def get_token(code:, code_verifier: nil, client_assertion: nil)
         params = {
           code:,
           code_verifier:,
-          grant_type:
-        }
+          grant_type:,
+          client_assertion:
+        }.compact
+
+        params[:client_assertion_type] = client_assertion_type unless client_assertion.nil?
+
         connection.post(TOKEN_PATH, params)
       end
     end
