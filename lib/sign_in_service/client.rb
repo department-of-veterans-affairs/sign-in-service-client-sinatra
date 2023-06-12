@@ -11,7 +11,6 @@ module SignInService
     include SignInService::Client::Authorize
     include SignInService::Client::Session
 
-
     attr_accessor :base_url, :client_id, :auth_type, :auth_flow
 
     def initialize(base_url:, client_id:, auth_type: :cookie, auth_flow: :pkce)
@@ -28,7 +27,6 @@ module SignInService
     def code_challenge_method
       'S256'
     end
-
 
     def client_assertion_type
       'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
