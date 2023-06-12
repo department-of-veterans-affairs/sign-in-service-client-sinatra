@@ -10,6 +10,7 @@ SignInService.configure do |config|
   config.base_url = ENV.fetch('SIS_BASE_URL')
   config.client_id = ENV.fetch('SIS_CLIENT_ID')
   config.auth_type = ENV.fetch('SIS_AUTH_TYPE').to_sym
+
   config.auth_flow = ENV.fetch('SIS_AUTH_FLOW').to_sym
 end
 

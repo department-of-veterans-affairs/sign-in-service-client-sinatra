@@ -3,9 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-  <link href="/assets/stylesheets/application.css" rel="stylesheet" type="text/css"">
-  <script>
+  <link rel="stylesheet" href="https://unpkg.com/@department-of-veterans-affairs/formation/dist/formation.min.css">
+  <link href="/assets/stylesheets/application.css" rel="stylesheet" type="text/css">
+   <title>Sign In Service Sample App</title>
+</head>
+<body>
+<header class="header">
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-item"> 
+    <a class="va-header-logo" href="/" > 
+      <img src='/assets/img/header-logo.png' alt="VA logo and Seal, U.S. Department of Veterans Affairs" height="59" width="264">
+    </a>
+  </div>
+  <div class="navbar-item nav-column">
+    <div> 
+      <h2 class="sample-app">Sign In Service Sample App</h2>
+    </div>
+  
+    <div>
+      <% if @current_user %>
+        <form method="post" action="/auth/logout">
+          <button class="" type="submit">Sign out</button>
+        </form>
+      <% end %>
+    </div>
+  </div>  
+</nav>  
+</header>
+
+  <div class='container hero is-fullheight'>
+    <% if message = flash[:notice]  %>
+      <div class="notification button is-success is-light">
+        <button class="delete"> <%= message %></button>
+       
+      </div>
+    <% elsif message = flash[:error] %>
+      <div class="notification button is-danger is-light">
+        <button class="delete"> <%= message %></button>
+       
+      </div>
+    <% end %>
+
+    <section class="section">
+      <div class="container">
+        <%= yield %>
+      </div>
+    </section>
+
+    <footer class="footer mt-auto">
+      <div class="content has-text-centered">
+      </div>
+    </footer>
+  </div>
+
+
+   <script>
+
     <% if @refreshable %>
       const baseUrl = '<%= @sis_base_url %>'
       const makeRequest = () => fetch(`${baseUrl}/v0/sign_in/refresh`, { method: 'POST', credentials: 'include' })
@@ -47,57 +101,5 @@
       }
     }
   </script>
-
-  <title>Sign In Service Sample App</title>
-</head>
-<body>
-  <nav class="navbar is-link" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-      <a class="navbar-item" href="/">
-        Sign In Service
-      </a>
-
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </a>
-    </div>
-    <div class="navbar-end">
-      <div class="navbar-item">
-        <div class="buttons">
-        <% if @current_user %>
-          <form method="post" action="/auth/logout">
-            <button class="button is-link is-light" type="submit">Sign out</button>
-          </form>
-        <% end %>
-        </div>
-      </div>
-    </div>
-  </nav>
-  <div class='container hero is-fullheight'>
-    <% if message = flash[:notice]  %>
-      <div class="notification is-success is-light">
-        <button class="delete"></button>
-        <%= message %>
-      </div>
-    <% elsif message = flash[:error] %>
-      <div class="notification is-danger is-light">
-        <button class="delete"></button>
-        <%= message %>
-      </div>
-    <% end %>
-
-    <section class="section">
-      <div class="container">
-        <%= yield %>
-      </div>
-    </section>
-
-    <footer class="footer mt-auto">
-      <div class="content has-text-centered">
-      </div>
-    </footer>
-  </div>
 </body>
 </html>

@@ -5,6 +5,7 @@ module SignInService
     DEFAULT_BASE_URL = 'http://localhost:3000'
     DEFAULT_CLIENT_ID = 'sample'
     DEFAULT_AUTH_TYPE = :cookie
+
     DEFAULT_AUTH_FLOW = :pkce
 
     attr_accessor :base_url, :client_id
@@ -14,6 +15,7 @@ module SignInService
       @base_url = DEFAULT_BASE_URL
       @client_id = DEFAULT_CLIENT_ID
       @auth_type = DEFAULT_AUTH_TYPE
+
       @auth_flow = DEFAULT_AUTH_FLOW
     end
 

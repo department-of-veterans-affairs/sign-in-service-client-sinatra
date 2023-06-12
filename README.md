@@ -10,12 +10,14 @@ An example app built with Sinatra that interfaces with Sign-in Service.
 ## Configuration
 ### Config the Sign-in Service Server
 Currently, SignInService is available as a part of `vets-api`
+
 1. Clone Repo
   ```bash
     git clone git@github.com:department-of-veterans-affairs/vets-api.git
   ```
 2. Follow [setup instructions](git@github.com:department-of-veterans-affairs/vets-api.git) for vets-api
 3. Ensure your database is prpoerly seeded `rails db:seed` this will add the necessary client configurations
+
 
 ### Configure the SignInService client
 This application uses the [SignInService Ruby Client](docs/sign_in_service_ruby_client.md)
@@ -45,10 +47,12 @@ the correct client and auth_type.
     config.auth_type = ENV.fetch('SIS_AUTH_TYPE').to_sym
   end
 ```
+
 3. Start the Sign-in Service server (`vets-api`)
 ```bash
   vets-api % rails s
 ```
+
 
 ## Running the Example app
 ### Native

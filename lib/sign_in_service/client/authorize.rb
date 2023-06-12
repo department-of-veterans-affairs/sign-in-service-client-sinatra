@@ -27,6 +27,7 @@ module SignInService
           code_challenge_method:,
           client_id:,
           state:
+
         }.compact
 
         uri.query = URI.encode_www_form(params)
@@ -66,6 +67,7 @@ module SignInService
       #
       # @return [Faraday::Response] Response with tokens in header or body
       #
+
       def get_token(code:, code_verifier: nil, client_assertion: nil)
         params = {
           code:,

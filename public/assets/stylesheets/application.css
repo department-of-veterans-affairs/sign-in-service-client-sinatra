@@ -1,9 +1,233 @@
-body { height: 100vh; }
+* {
+	box-sizing: border-box;
+}
+
+body {
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: space-between;
+	background: white;
+	height: 100vh;
+}
+
+a {
+	text-decoration: none;
+	color: orange;
+}
+
+h2 {
+	margin: 0;
+}
+
+svg {
+	width: 60%;
+	max-height: 20px;
+}
+
+.va-header-logo {
+	width: 100%;
+	height: auto;
+}
+
+.header {
+	min-height: 167.19px;
+	background-color: #112e51;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.navbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 70vw;
+	max-width: 1000px;
+}
+
+.navbar-item {
+	color: white;
+	height: auto;
+	width: auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: flex-end;
+}
+
+.sample-app {
+	font-size: medium;
+	font-weight: 400;
+	text-align: end;
+}
+
+.sign-in-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 1vh;
+	max-width: 1000px;
+	margin: 10vh auto;
+	width: 70vw;
+}
+
+.control {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto;
+}
 
 .notification {
-  position: fixed;
-  top: 1%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
+	position: fixed;
+	top: 5%;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 9999;
+	text-align: center;
+	width: auto !important;
+}
+
+.button {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	max-width: 330px;
+	padding: 0.75em;
+	font-size: 16px;
+	margin: 1em 0;
+}
+
+.idme {
+	height: max-content;
+	background-color: #2e8540;
+}
+
+.usa-button.idme:active,
+.usa-button.idme:hover {
+	background-color: #305f39;
+}
+
+.loginGov {
+	background-color: #e31c3d;
+}
+
+.usa-button.loginGov:active,
+.usa-button.loginGov:hover{
+	background-color: #ae1c34;
+}
+
+.columns {
+	margin: 0 auto;
+	padding: 0;
+
+	max-width: 1000px;
+}
+
+.container.hero {
+	flex-grow: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	margin: auto;
+	width: 100%;
+}
+
+.section {
+	width: 100%;
+	height: 100%;
+	padding: 0 15vh;
+}
+
+.card {
+	overflow-y: scroll;
+	max-height: 50vh;
+}
+
+/* width */
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+@media (max-width: 650px) {
+	.section {
+		padding: 10%;
+	}
+
+	.navbar {
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		padding: 10%;
+	}
+
+	.navbar-item {
+		flex-direction: row;
+		width: 100%;
+		padding: 0;
+		justify-content: space-between;
+		align-items: center;
+	}
+	img {
+		margin: 0 auto;
+	}
+	.va-header-logo {
+		width: 100%;
+		display: flex;
+		flex-direction: center;
+	}
+}
+
+.section .container {
+	display: flex;
+	flex-direction: column;
+	height: 60vh;
+	width: 100%;
+}
+
+button {
+	width: 100%;
+	padding: 10px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	width: 100%;
+	max-width: 330px;
+	padding: 0.75em;
+	font-size: 16px;
+	margin: 1em 0;
+	white-space: normal !important;
+}
+
+.usa-button {
+	width: 100%;
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 0;
+	padding-right: 0;
+	display: block;
+	text-align: center;
 }
