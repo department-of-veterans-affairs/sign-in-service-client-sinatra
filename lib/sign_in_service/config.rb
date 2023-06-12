@@ -25,7 +25,6 @@ module SignInService
       @auth_type = value
     end
 
-
     def auth_flow=(value)
       raise ArgumentError, "invalid auth flow: #{value}" unless AUTH_FLOWS.include?(value)
 
