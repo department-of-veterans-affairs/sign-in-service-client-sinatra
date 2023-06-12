@@ -18,7 +18,6 @@ module SignInService
       # @return [String] URI to authorize client
       #
 
-
       def authorize_uri(type:, acr:, code_challenge: nil, state: nil)
         uri = URI.join(base_url, AUTHORIZE_PATH)
         params = {
