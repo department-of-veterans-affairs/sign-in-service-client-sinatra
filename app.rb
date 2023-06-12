@@ -55,7 +55,6 @@ namespace '/auth' do
   end
 
   get '/result' do
-
     if SignInService.client.auth_flow == SignInService::JWT_FLOW
       client_assertion = new_encoded_jwt
     else
@@ -203,7 +202,6 @@ helpers do
     session.clear
     cookies.clear
   end
-
 
   def new_encoded_jwt
     payload = {
