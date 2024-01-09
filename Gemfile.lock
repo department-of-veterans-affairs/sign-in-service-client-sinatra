@@ -11,11 +11,10 @@ GEM
       rexml
     diff-lcs (1.5.0)
     dotenv (2.8.1)
-    faraday (2.8.1)
-      base64
-      faraday-net_http (>= 2.0, < 3.1)
-      ruby2_keywords (>= 0.0.4)
-    faraday-net_http (3.0.2)
+    faraday (2.9.0)
+      faraday-net_http (>= 2.0, < 3.2)
+    faraday-net_http (3.1.0)
+      net-http
     hashdiff (1.0.1)
     json (2.7.1)
     jwt (2.7.1)
@@ -24,6 +23,8 @@ GEM
     multi_json (1.15.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
+    net-http (0.4.1)
+      uri
     nio4r (2.7.0)
     parallel (1.24.0)
     parser (3.3.0.0)
@@ -100,6 +101,7 @@ GEM
       tilt (~> 2.0)
     tilt (2.3.0)
     unicode-display_width (2.5.0)
+    uri (0.13.0)
     webmock (3.19.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
