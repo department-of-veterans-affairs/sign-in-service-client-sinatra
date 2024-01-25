@@ -28,8 +28,42 @@ end
 get '/' do
   @current_user = find_current_user
 
+  erb :index
+end
+
+get '/sign_in' do
+  redirect to '/profile' if session[:current_user]
+  erb :sign_in
+end
+
+get '/profile' do
+  @current_user = find_current_user
+  @user_info = [
+    { label: 'Full name',
+      value: "#{@current_user[:first_name]} #{@current_user[:middle_name]} #{@current_user[:last_name]}" },
+    { label: 'ICN', value: @current_user[:icn] },
+    { label: 'ID.me UUID', value: @current_user[:idme_uuid] },
+    { label: 'Login.gov UUID', value: @current_user[:logingov_uuid] },
+    { label: 'UUID', value: @current_user[:uuid] },
+    { label: 'Birth Date', value: @current_user[:birth_date] },
+    { label: 'Email', value: @current_user[:email] },
+    { label: 'Gender', value: @current_user[:gender] },
+    { label: 'BIRLS ID', value: @current_user[:birls_id] },
+    { label: 'EDIPI', value: @current_user[:edipi] },
+    { label: 'Active MHV ID', value: @current_user[:active_mhv_ids].join(', ') },
+    { label: 'SEC ID', value: @current_user[:sec_id] },
+    { label: 'Vet360 ID', value: @current_user[:vet360_id] },
+    { label: 'Participant ID', value: @current_user[:participant_id] },
+    { label: 'Cerner ID', value: @current_user[:cerner_id] },
+    { label: 'Cerner Facility IDs', value: @current_user[:cerner_facility_ids].join(', ') },
+    { label: 'VHA Facility IDs', value: @current_user[:vha_facility_ids].join(', ') },
+    { label: 'ID Theft Flag', value: @current_user[:id_theft_flag] ? 'Yes' : 'No' },
+    { label: 'Verified', value: @current_user[:verified] ? 'Yes' : 'No' }
+  ]
+
   if @current_user.nil?
     flash[:error] = 'Sign in to access this page'
+    redirect to '/sign_in'
   else
     @refreshable = valid_refresh_token?
     @sis_base_url = SignInService.config.base_url
@@ -38,11 +72,11 @@ get '/' do
     @refresh_token_expiration = refresh_token_expiration
   end
 
-  erb :index
+  erb :profile
 end
 
 namespace '/auth' do
-  post '/request' do
+  get '/request' do
     if SignInService.client.auth_flow == SignInService::PKCE_FLOW
       pkce = Pkce.new
       session[:code_verifier] = pkce.code_verifier
@@ -66,18 +100,18 @@ namespace '/auth' do
     store_tokens(sis_response)
 
     flash[:notice] = 'You have successfully signed in'
-    redirect to '/'
+    redirect to '/profile'
   end
 
   post '/refresh' do
     refresh_session
   end
 
-  post '/logout' do
+  get '/logout' do
     sis_response = SignInService.client.logout(access_token:, anti_csrf_token:)
+    clear_session
 
     flash[:notice] = 'You have successfully signed out'
-    clear_session
 
     redirect to sis_response.headers['location'] if sis_response.status == 302
     redirect to '/'
@@ -96,14 +130,14 @@ end
 
 helpers do
   def find_current_user
-    session[:current_user] ||= if session[:current_user] && valid_access_token?
-                                 session[:current_user]
-                               elsif valid_access_token?
-                                 introspect
-                               else
-                                 clear_session
-                                 nil
-                               end
+    session[:current_user] = if session[:current_user] && valid_access_token?
+                               session[:current_user]
+                             elsif valid_access_token?
+                               introspect
+                             else
+                               clear_session
+                               nil
+                             end
   end
 
   def introspect
@@ -199,7 +233,10 @@ helpers do
   end
 
   def clear_session
-    session.clear
+    session.delete(:current_user)
+    session.delete(:access_token)
+    session.delete(:refresh_token)
+    session.delete(:anti_csrf_token)
     cookies.clear
   end
 
