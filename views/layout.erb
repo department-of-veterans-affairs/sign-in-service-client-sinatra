@@ -1,65 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/@department-of-veterans-affairs/formation/dist/formation.min.css">
-  <link href="/assets/stylesheets/application.css" rel="stylesheet" type="text/css">
-   <title>Sign In Service Sample App</title>
-</head>
-<body>
-<header class="header">
-
-<nav class="navbar" role="navigation" aria-label="main navigation">
-  <div class="navbar-item"> 
-    <a class="va-header-logo" href="/" > 
-      <img src='/assets/img/header-logo.png' alt="VA logo and Seal, U.S. Department of Veterans Affairs" height="59" width="264">
-    </a>
-  </div>
-  <div class="navbar-item nav-column">
-    <div> 
-      <h2 class="sample-app">Sign In Service Sample App</h2>
-    </div>
-  
-    <div>
-      <% if @current_user %>
-        <form method="post" action="/auth/logout">
-          <button class="" type="submit">Sign out</button>
-        </form>
-      <% end %>
-    </div>
-  </div>  
-</nav>  
-</header>
-
-  <div class='container hero is-fullheight'>
-    <% if message = flash[:notice]  %>
-      <div class="notification button is-success is-light">
-        <button class="delete"> <%= message %></button>
-       
-      </div>
-    <% elsif message = flash[:error] %>
-      <div class="notification button is-danger is-light">
-        <button class="delete"> <%= message %></button>
-       
-      </div>
-    <% end %>
-
-    <section class="section">
-      <div class="container">
-        <%= yield %>
-      </div>
-    </section>
-
-    <footer class="footer mt-auto">
-      <div class="content has-text-centered">
-      </div>
-    </footer>
-  </div>
-
-
-   <script>
-
+  <title>Sign In Service Sample Client</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="/assets/img/favicon.ico" />
+  <script>
     <% if @refreshable %>
       const baseUrl = '<%= @sis_base_url %>'
       const makeRequest = () => fetch(`${baseUrl}/v0/sign_in/refresh`, { method: 'POST', credentials: 'include' })
@@ -71,35 +16,103 @@
   </script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
-        const $notification = $delete.parentNode;
-
-        $delete.addEventListener('click', () => {
-          $notification.parentNode.removeChild($notification);
-        });
-      });
-    });
     setTimeout(function() {
       document.querySelectorAll('.notification').forEach(function(notification) {
         notification.remove();
       });
-    }, 5000);
+    }, 3000);
   </script>
-
-  <script>
-    function toggleSensitiveInfo(id) {
-      const element = document.getElementById(id);
-      const button = document.getElementById(id + '-btn');
-
-      if (element.style.display === 'none') {
-        element.style.display = 'inline';
-        button.textContent = 'Hide';
-      } else {
-        element.style.display = 'none';
-        button.textContent = 'Reveal';
-      }
-    }
-  </script>
+</head>
+<html class="h-full">
+<body class="h-full">
+  <div class="min-h-full">
+    <nav class="border-b border-gray-200 bg-[#112e51]">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-20 justify-between">
+          <div class="flex">
+            <div class="flex flex-shrink-0 items-center">
+              <a class="va-header-logo" href="/" >
+              <img src='/assets/img/header-logo.svg' alt="VA Identity Logo" height="59" width="264">
+              </a>
+            </div>
+            <div class="hidden md:block">
+              <div class="ml-10 flex items-baseline space-x-">
+                <a href="https://github.com/department-of-veterans-affairs/sign-in-service-client-sinatra"" class="flex items-center justify-center gap-3 rounded-md bg-transparent px-3 py-2 text-sm font-medium text-white hover:bg-[#4a77b4] mt-6">
+                  <svg class="h-5 w-5 fill-[#FFF]" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-sm font-semibold leading-6">Repo</span>
+                </a>
+                  <a href="https://github.com/department-of-veterans-affairs/va.gov-team/tree/master/products/identity/Products/Sign-In%20Service" class="flex items-center justify-center gap-3 rounded-md bg-transparent px-3 py-2 text-sm font-medium text-white hover:bg-[#4a77b4] mt-6">
+                  <svg class="h-5 w-5 fill-[#FFF]" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-sm font-semibold leading-6">Sign-in Service Docs</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <% if @current_user %>
+              <a href="/auth/logout" class="inline-block w-full rounded-md border border-transparent bg-[#4a77b4] px-6 py-2 font-medium text-white hover:bg-blue-800 sm:w-auto">Sign out</a>
+            <% else %>
+              <a href="/sign_in" class="inline-block w-full rounded-md border border-transparent bg-[#4a77b4] px-6 py-2 font-medium text-white hover:bg-blue-800 sm:w-auto">Sign in</a>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="py-10">
+      <header>
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900"></h1>
+        </div>
+      </header>
+      <main>
+        <div class="relative">
+          <% if message = flash[:notice]%>
+            <div class="absolute top-0 left-0 w-full rounded-md bg-green-50 notification z-10">
+              <div class="flex">
+                <div class="rounded-md bg-green-50 p-4 z-10">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium text-green-800"><%= message %></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% elsif message = flash[:error]%>
+            <div class="absolute top-0 left-0 w-full rounded-md bg-red-50 notification z-10">
+              <div class="flex">
+                <div class="rounded-md bg-red-50 p-4 z-10">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                       <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm font-medium text-red-800"><%= message %></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 mt-12">
+            <div class="relative overflow-hidden bg-white">
+              <%= yield %>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
 </body>
 </html>
