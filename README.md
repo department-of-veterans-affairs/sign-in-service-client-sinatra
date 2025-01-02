@@ -16,8 +16,30 @@ Currently, SignInService is available as a part of `vets-api`
     git clone git@github.com:department-of-veterans-affairs/vets-api.git
   ```
 2. Follow [setup instructions](git@github.com:department-of-veterans-affairs/vets-api.git) for vets-api
-3. Ensure your database is prpoerly seeded `rails db:seed` this will add the necessary client configurations
+3. Ensure your database is properly seeded `rails db:seed` this will add the necessary client configurations
 
+### Creating a New Client Configuration
+If you need to create a new client configuration in vets-api:
+
+```ruby
+# In vets-api rails console
+client = SignIn::ClientConfig.create!(
+  client_id: 'sample_client_api',
+  authentication: 'api',
+  pkce: true,
+  redirect_uri: 'http://localhost:4567/auth/callback',
+  access_token_duration: 300,
+  refresh_token_duration: 1800,
+  access_token_audience: 'va.gov',
+  anti_csrf: true,
+  shared_sessions: true,
+  service_levels: ['ial2'],
+  access_token_attributes: ['first_name', 'last_name', 'email'],
+  description: 'Sign In Service Example Client',
+  logout_redirect_uri: 'http://localhost:4567/',
+  credential_service_providers: ['idme', 'logingov']
+)
+```
 
 ### Configure the SignInService client
 This application uses the [SignInService Ruby Client](docs/sign_in_service_ruby_client.md)
@@ -52,7 +74,6 @@ the correct client and auth_type.
 ```bash
   vets-api % rails s
 ```
-
 
 ## Running the Example app
 ### Native
