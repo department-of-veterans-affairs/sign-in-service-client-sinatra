@@ -11,13 +11,14 @@ module SignInService
     include SignInService::Client::Authorize
     include SignInService::Client::Session
 
-    attr_accessor :base_url, :client_id, :auth_type, :auth_flow
+    attr_accessor :base_url, :client_id, :auth_type, :auth_flow, :redirect_uri
 
-    def initialize(base_url:, client_id:, auth_type: :cookie, auth_flow: :pkce)
+    def initialize(base_url:, client_id:, auth_type: :cookie, auth_flow: :pkce, redirect_uri: nil)
       @base_url = base_url
       @client_id = client_id
       @auth_type = auth_type
       @auth_flow = auth_flow
+      @redirect_uri = redirect_uri
     end
 
     def grant_type
@@ -50,9 +51,11 @@ module SignInService
 
     def to_h
       {
-        base_url:,
-        client_id:,
-        auth_type:
+        base_url: base_url,
+        client_id: client_id,
+        auth_type: auth_type,
+        auth_flow: auth_flow,
+        redirect_uri: redirect_uri
       }
     end
   end

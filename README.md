@@ -112,3 +112,25 @@ To run the `rubocop` linter:
 ```bash
 bin/lint
 ```
+
+## Environment Configuration
+
+This application uses environment variables for configuration. To set up your environment:
+
+1. Copy `.env.example` to `.env.local`:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Edit `.env.local` with your specific configuration values.
+
+**Note:** Never edit `.env` directly. Always use `.env.local` for your local development environment. The `.env.local` file is ignored by git to prevent sensitive information from being committed.
+
+Key environment variables:
+- `SIS_BASE_URL`: Base URL for the Sign-In Service
+- `CLIENT_ID`: Your client identifier
+- `AUTH_TYPE`: Authentication type (api/cookie)
+- `AUTH_FLOW`: Authentication flow (pkce/client_credentials)
+- `TEST_MODE`: Enable/disable test mode
+
+For development, you can enable test mode by setting `TEST_MODE=true` in your `.env.local` file.

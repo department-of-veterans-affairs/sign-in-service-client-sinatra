@@ -7,6 +7,7 @@ module SignInService
   COOKIE_TOKEN_PREFIX = 'vagov'
   AUTH_TYPES = [COOKIE_AUTH = :cookie, API_AUTH = :api].freeze
   AUTH_FLOWS = [PKCE_FLOW = :pkce, JWT_FLOW = :jwt].freeze
+  TEST_MODE = (ENV['SIS_TEST_MODE'] || 'false').downcase == 'true'
 
   class << self
     attr_accessor :config
@@ -16,9 +17,10 @@ module SignInService
                   @client
                 else
                   SignInService::Client.new(base_url: config.base_url,
-                                            client_id: config.client_id,
-                                            auth_type: config.auth_type,
-                                            auth_flow: config.auth_flow)
+                                          client_id: config.client_id,
+                                          auth_type: config.auth_type,
+                                          auth_flow: config.auth_flow,
+                                          redirect_uri: config.redirect_uri)
                 end
     end
 

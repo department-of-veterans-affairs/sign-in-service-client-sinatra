@@ -1,0 +1,25 @@
+=== puma startup: 2025-01-10 09:24:26 -0800 ===
+[6768] - Worker 0 (PID: 6787) booted in 0.0s, phase: 0
+[6768] - Worker 1 (PID: 6788) booted in 0.0s, phase: 0
+[6768] - Worker 2 (PID: 6789) booted in 0.0s, phase: 0
+[6768] - Gracefully shutting down workers...
+[6768] === puma shutdown: 2025-01-10 09:25:44 -0800 ===
+[6768] - Goodbye!
+=== puma startup: 2025-01-10 09:25:54 -0800 ===
+[7266] - Worker 0 (PID: 7287) booted in 0.0s, phase: 0
+[7266] - Worker 1 (PID: 7288) booted in 0.0s, phase: 0
+[7266] - Worker 2 (PID: 7289) booted in 0.0s, phase: 0
+[7266] === puma shutdown: 2025-01-10 09:26:59 -0800 ===
+[7266] - Goodbye!
+[7266] - Gracefully shutting down workers...
+=== puma startup: 2025-01-10 09:28:50 -0800 ===
+- Gracefully stopping, waiting for requests to finish
+=== puma shutdown: 2025-01-10 09:29:28 -0800 ===
+- Goodbye!
+=== puma startup: 2025-01-10 09:29:31 -0800 ===
+[9173] - Worker 0 (PID: 9199) booted in 0.0s, phase: 0
+[9173] - Worker 1 (PID: 9200) booted in 0.0s, phase: 0
+[9173] - Worker 2 (PID: 9201) booted in 0.0s, phase: 0
+[9173] - Gracefully shutting down workers...
+[9173] === puma shutdown: 2025-01-10 09:30:36 -0800 ===
+[9173] - Goodbye!
