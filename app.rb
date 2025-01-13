@@ -17,15 +17,36 @@ require 'sinatra/flash_helper'
 require 'sinatra/reloader' if development?
 require 'pry' if development?
 
-ENV['SIS_TEST_MODE'] = ENV['TEST_MODE'] if ENV['TEST_MODE']
+ENV['SIS_TEST_MODE'] = 'false' unless development?
 
 set :erb, escape_html: true
 set :logger, Logger.new($stdout)
-set :show_exceptions, :after_handler
+set :show_exceptions, false
+set :raise_errors, false
+set :vets_api_url, ENV.fetch('VETS_API_URL', 'http://localhost:3000')
+set :client_id, ENV.fetch('CLIENT_ID', 'load_test_client')
 
-use Rack::Session::Cookie, key: 'rack.session',
-                           path: '/',
-                           secret: ENV.fetch('SESSION_SECRET', SecureRandom.hex(32))
+use Rack::Session::Cookie,
+  key: 'rack.session',
+  path: '/',
+  secret: ENV.fetch('SESSION_SECRET', 'test-session-secret'),
+  expire_after: 2592000, # 30 days
+  secure: false, # Set to false for local testing
+  httponly: true,
+  same_site: :lax,
+  domain: nil, # Allow cookie to be set for localhost
+  sidbits: 128,
+  renew: true
+
+configure do
+  enable :logging
+end
+
+puts "\nSinatra Configuration:"
+puts "  Environment: #{settings.environment}"
+puts "  Vets API URL: #{settings.vets_api_url}"
+puts "  Client ID: #{settings.client_id}"
+puts "  Test Mode: #{SignInService::TEST_MODE}"
 
 before '/' do
   refresh_api_session if api_auth?
@@ -82,56 +103,136 @@ end
 
 namespace '/auth' do
   get '/request' do
-    if SignInService.client.auth_flow == SignInService::PKCE_FLOW
-      pkce = Pkce.new
-      session[:code_verifier] = pkce.code_verifier
-      code_challenge = pkce.code_challenge
-    end
-
-    if SignInService::TEST_MODE
-      test_code = SecureRandom.hex(16)
-      session[:test_auth_code] = test_code
-      redirect to "/auth/callback?code=#{test_code}"
-    else
-      authorize_uri = SignInService.client.authorize_uri(type: params[:type], acr: params[:acr], code_challenge:)
-      redirect to authorize_uri
+    logger.debug "Starting GET /auth/request"
+    
+    begin
+      # Get and validate parameters
+      type = params[:type] || 'idme'
+      acr = params[:acr] || 'loa3'
+      
+      # Log request parameters
+      logger.info "Auth Request Parameters:"
+      logger.info "  Type: #{type}"
+      logger.info "  ACR: #{acr}"
+      
+      # Generate PKCE values
+      code_verifier = SecureRandom.urlsafe_base64(32)
+      code_challenge = Base64.urlsafe_encode64(
+        OpenSSL::Digest::SHA256.digest(code_verifier),
+        padding: false
+      )
+      
+      # Store session data
+      session[:code_verifier] = code_verifier
+      session[:code_challenge] = code_challenge
+      session[:auth_type] = type
+      session[:auth_acr] = acr
+      session[:state] = SecureRandom.hex(16)
+      
+      # Get authorize URI from client
+      authorize_uri = SignInService.client.authorize_uri(
+        type: type,
+        acr: acr,
+        code_challenge: code_challenge
+      )
+      
+      logger.info "Generated authorize URI: #{authorize_uri}"
+      logger.info "Session ID: #{session.id}"
+      
+      # Set response headers
+      headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+      headers['Pragma'] = 'no-cache'
+      
+      # Redirect to vets-api
+      redirect authorize_uri, 302
+    rescue => e
+      logger.error "Auth Request Error: #{e.message}"
+      logger.error e.backtrace.join("\n")
+      halt 500, { error: 'Internal Server Error', message: e.message }.to_json
     end
   end
 
   get '/callback' do
-    if SignInService.client.auth_flow == SignInService::JWT_FLOW
-      client_assertion = new_encoded_jwt
-    else
-      code_verifier = session[:code_verifier]
-    end
-
-    if SignInService::TEST_MODE
-      test_tokens = {
-        data: {
-          access_token: "test_access_token_#{SecureRandom.hex(8)}",
-          refresh_token: "test_refresh_token_#{SecureRandom.hex(8)}",
-          id_token: "test_id_token_#{SecureRandom.hex(8)}",
-          expires_in: 3600,
-          token_type: "Bearer"
+    begin
+      if SignInService::TEST_MODE
+        test_tokens = {
+          data: {
+            access_token: "test_access_token_#{SecureRandom.hex(8)}",
+            refresh_token: "test_refresh_token_#{SecureRandom.hex(8)}",
+            id_token: "test_id_token_#{SecureRandom.hex(8)}",
+            expires_in: 3600,
+            token_type: "Bearer",
+            type: session[:auth_type],
+            acr: session[:auth_acr]
+          }
         }
-      }
-      store_tokens(OpenStruct.new(
-        status: 200,
-        body: test_tokens.to_json,
-        headers: { 'Set-Cookie' => "access_token=#{test_tokens[:data][:access_token]}" }
-      ))
-      session.delete(:test_auth_code)
-      redirect to '/profile'
-    else
-      sis_response = SignInService.client.get_token(code: params[:code], code_verifier:, client_assertion:)
-      store_tokens(sis_response)
-      flash[:notice] = 'You have successfully signed in'
-      redirect to '/profile'
+        store_tokens(OpenStruct.new(
+          status: 200,
+          body: test_tokens.to_json,
+          headers: { 'Set-Cookie' => "access_token=#{test_tokens[:data][:access_token]}" }
+        ))
+        session.delete(:test_auth_code)
+        session.delete(:auth_type)
+        session.delete(:auth_acr)
+        redirect to '/profile'
+      else
+        # Get necessary parameters for token exchange
+        code = params[:code]
+        code_verifier = session[:code_verifier]
+        client_assertion = SignInService.client.auth_flow == SignInService::JWT_FLOW ? new_encoded_jwt : nil
+
+        # Log callback parameters for debugging
+        logger.info "Callback - Code: #{code}, Verifier: #{code_verifier ? '[PRESENT]' : '[MISSING]'}"
+
+        # Exchange code for tokens via vets-api
+        sis_response = SignInService.client.get_token(
+          code: code,
+          code_verifier: code_verifier,
+          client_assertion: client_assertion
+        )
+
+        # Store tokens and redirect to profile
+        store_tokens(sis_response)
+        flash[:notice] = 'You have successfully signed in'
+        redirect to '/profile'
+      end
+    rescue => e
+      logger.error "Callback Error: #{e.message}"
+      logger.error e.backtrace.join("\n")
+      status 500
+      { error: 'Internal Server Error', message: e.message }.to_json
     end
   end
 
   post '/refresh' do
-    refresh_session
+    begin
+      # Get refresh token from session or cookies
+      refresh_token_value = refresh_token
+      anti_csrf_token_value = anti_csrf_token
+
+      if refresh_token_value.nil?
+        status 401
+        return { error: 'No refresh token available' }.to_json
+      end
+
+      # Exchange refresh token for new tokens
+      sis_response = SignInService.client.refresh_token(
+        refresh_token: refresh_token_value,
+        anti_csrf_token: anti_csrf_token_value
+      )
+
+      # Store new tokens
+      store_tokens(sis_response)
+
+      # Return success response
+      status 200
+      { message: 'Token refreshed successfully' }.to_json
+    rescue => e
+      logger.error "Refresh Error: #{e.message}"
+      logger.error e.backtrace.join("\n")
+      status 500
+      { error: 'Failed to refresh token', message: e.message }.to_json
+    end
   end
 
   get '/logout' do
@@ -255,11 +356,7 @@ helpers do
   end
 
   def clear_session
-    session.delete(:current_user)
-    session.delete(:access_token)
-    session.delete(:refresh_token)
-    session.delete(:anti_csrf_token)
-    cookies.clear
+    session.clear
   end
 
   def new_encoded_jwt
