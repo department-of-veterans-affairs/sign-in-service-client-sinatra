@@ -129,6 +129,9 @@ namespace '/auth' do
       session[:auth_acr] = acr
       session[:state] = SecureRandom.hex(16)
       
+      # Force session commit
+      session.options[:defer] = false
+      
       # Get authorize URI from client
       authorize_uri = SignInService.client.authorize_uri(
         type: type,
@@ -140,11 +143,24 @@ namespace '/auth' do
       logger.info "Session ID: #{session.id}"
       
       # Set response headers
-      headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
-      headers['Pragma'] = 'no-cache'
+      response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+      response.headers['Pragma'] = 'no-cache'
       
-      # Redirect to vets-api
-      redirect authorize_uri, 302
+      # Ensure session cookie is set
+      response.set_cookie(
+        'rack.session',
+        value: session.id,
+        path: '/',
+        expire_after: 2592000,
+        httponly: true,
+        secure: false,
+        same_site: :lax
+      )
+      
+      # Return HTML with meta refresh
+      status 200
+      content_type 'text/html'
+      erb :oauth_form, locals: { authorize_uri: authorize_uri }
     rescue => e
       logger.error "Auth Request Error: #{e.message}"
       logger.error e.backtrace.join("\n")
