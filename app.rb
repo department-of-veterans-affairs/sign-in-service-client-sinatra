@@ -64,6 +64,13 @@ end
 
 get '/profile' do
   @current_user = find_current_user
+
+  if @current_user.nil?
+    flash[:error] = 'Sign in to access this page'
+    redirect to '/sign_in'
+    return
+  end
+
   @user_info = [
     { label: 'Full name',
       value: "#{@current_user[:first_name]} #{@current_user[:middle_name]} #{@current_user[:last_name]}" },
@@ -87,16 +94,11 @@ get '/profile' do
     { label: 'Verified', value: @current_user[:verified] ? 'Yes' : 'No' }
   ]
 
-  if @current_user.nil?
-    flash[:error] = 'Sign in to access this page'
-    redirect to '/sign_in'
-  else
-    @refreshable = valid_refresh_token?
-    @sis_base_url = SignInService.config.base_url
-    @auth_type = SignInService.config.auth_type
-    @access_token_expiration = access_token_expiration
-    @refresh_token_expiration = refresh_token_expiration
-  end
+  @refreshable = valid_refresh_token?
+  @sis_base_url = SignInService.config.base_url
+  @auth_type = SignInService.config.auth_type
+  @access_token_expiration = access_token_expiration
+  @refresh_token_expiration = refresh_token_expiration
 
   erb :profile
 end
@@ -129,8 +131,15 @@ namespace '/auth' do
       session[:auth_acr] = acr
       session[:state] = SecureRandom.hex(16)
       
-      # Force session commit
+      # Force session commit and ensure cookie is set
       session.options[:defer] = false
+      session.options[:renew] = true
+      
+      # Log session data for debugging
+      logger.info "Session Data:"
+      logger.info "  Session ID: #{session.id}"
+      logger.info "  Code Verifier Present: #{!session[:code_verifier].nil?}"
+      logger.info "  Code Challenge Present: #{!session[:code_challenge].nil?}"
       
       # Get authorize URI from client
       authorize_uri = SignInService.client.authorize_uri(
@@ -140,13 +149,12 @@ namespace '/auth' do
       )
       
       logger.info "Generated authorize URI: #{authorize_uri}"
-      logger.info "Session ID: #{session.id}"
       
       # Set response headers
       response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
       response.headers['Pragma'] = 'no-cache'
       
-      # Ensure session cookie is set
+      # Set session cookie with explicit domain and path
       response.set_cookie(
         'rack.session',
         value: session.id,
@@ -154,7 +162,8 @@ namespace '/auth' do
         expire_after: 2592000,
         httponly: true,
         secure: false,
-        same_site: :lax
+        same_site: :lax,
+        domain: nil
       )
       
       # Return HTML with meta refresh
@@ -171,6 +180,7 @@ namespace '/auth' do
   get '/callback' do
     begin
       if SignInService::TEST_MODE
+        # Create test tokens
         test_tokens = {
           data: {
             access_token: "test_access_token_#{SecureRandom.hex(8)}",
@@ -182,33 +192,87 @@ namespace '/auth' do
             acr: session[:auth_acr]
           }
         }
-        store_tokens(OpenStruct.new(
-          status: 200,
-          body: test_tokens.to_json,
-          headers: { 'Set-Cookie' => "access_token=#{test_tokens[:data][:access_token]}" }
-        ))
-        session.delete(:test_auth_code)
+
+        # Store tokens in session
+        session[:access_token] = test_tokens[:data][:access_token]
+        session[:refresh_token] = test_tokens[:data][:refresh_token]
+        session[:id_token] = test_tokens[:data][:id_token]
+        session[:token_type] = test_tokens[:data][:token_type]
+        session[:expires_in] = test_tokens[:data][:expires_in]
+
+        # Set mock user data directly in session
+        session[:current_user] = {
+          first_name: 'Test',
+          middle_name: 'E',
+          last_name: 'User',
+          icn: '123456789V123456',
+          idme_uuid: SecureRandom.uuid,
+          logingov_uuid: SecureRandom.uuid,
+          uuid: SecureRandom.uuid,
+          birth_date: '1990-01-01',
+          email: 'test.user@example.com',
+          gender: 'M',
+          birls_id: '123456',
+          edipi: '1234567890',
+          active_mhv_ids: ['12345'],
+          sec_id: '123456789',
+          vet360_id: '123456789',
+          participant_id: '123456789',
+          cerner_id: '123456789',
+          cerner_facility_ids: ['123'],
+          vha_facility_ids: ['456'],
+          id_theft_flag: false,
+          verified: true
+        }
+
+        # Force session commit
+        session.options[:defer] = false
+        session.options[:renew] = true
+
+        # Clean up session
+        session.delete(:code_verifier)
+        session.delete(:code_challenge)
         session.delete(:auth_type)
         session.delete(:auth_acr)
+        session.delete(:state)
+
+        flash[:notice] = 'You have successfully signed in'
         redirect to '/profile'
       else
         # Get necessary parameters for token exchange
         code = params[:code]
         code_verifier = session[:code_verifier]
-        client_assertion = SignInService.client.auth_flow == SignInService::JWT_FLOW ? new_encoded_jwt : nil
-
+        
         # Log callback parameters for debugging
-        logger.info "Callback - Code: #{code}, Verifier: #{code_verifier ? '[PRESENT]' : '[MISSING]'}"
+        logger.info "Callback Parameters:"
+        logger.info "  Code: #{code ? '[PRESENT]' : '[MISSING]'}"
+        logger.info "  Code Verifier: #{code_verifier ? '[PRESENT]' : '[MISSING]'}"
+        logger.info "  Session ID: #{session.id}"
+        logger.info "  Auth Flow: #{SignInService.config.auth_flow}"
+        
+        if code_verifier.nil?
+          logger.error "Missing code_verifier in session"
+          halt 400, { error: 'Missing code_verifier', message: 'Session data not found' }.to_json
+        end
 
         # Exchange code for tokens via vets-api
         sis_response = SignInService.client.get_token(
           code: code,
           code_verifier: code_verifier,
-          client_assertion: client_assertion
+          client_assertion: nil
         )
 
-        # Store tokens and redirect to profile
+        # Store tokens and user data
         store_tokens(sis_response)
+        
+        # Get and store user data
+        user_data = introspect
+        session[:current_user] = user_data if user_data
+
+        # Force session commit
+        session.options[:defer] = false
+        session.options[:renew] = true
+
         flash[:notice] = 'You have successfully signed in'
         redirect to '/profile'
       end
@@ -274,19 +338,77 @@ end
 
 helpers do
   def find_current_user
-    session[:current_user] = if session[:current_user] && valid_access_token?
-                               session[:current_user]
-                             elsif valid_access_token?
-                               introspect
-                             else
-                               clear_session
-                               nil
-                             end
+    if SignInService::TEST_MODE
+      # Return mock user data in test mode if we have a test token or current_user in session
+      return session[:current_user] if session[:current_user]
+      return nil unless session[:access_token]&.start_with?('test_')
+
+      mock_user = {
+        first_name: 'Test',
+        middle_name: 'E',
+        last_name: 'User',
+        icn: '123456789V123456',
+        idme_uuid: SecureRandom.uuid,
+        logingov_uuid: SecureRandom.uuid,
+        uuid: SecureRandom.uuid,
+        birth_date: '1990-01-01',
+        email: 'test.user@example.com',
+        gender: 'M',
+        birls_id: '123456',
+        edipi: '1234567890',
+        active_mhv_ids: ['12345'],
+        sec_id: '123456789',
+        vet360_id: '123456789',
+        participant_id: '123456789',
+        cerner_id: '123456789',
+        cerner_facility_ids: ['123'],
+        vha_facility_ids: ['456'],
+        id_theft_flag: false,
+        verified: true
+      }
+      
+      session[:current_user] = mock_user
+      mock_user
+    elsif session[:current_user] && valid_access_token?
+      session[:current_user]
+    elsif valid_access_token?
+      session[:current_user] = introspect
+    else
+      clear_session
+      nil
+    end
   end
 
   def introspect
-    sis_response = SignInService.client.introspect(access_token:)
-    JSON.parse(sis_response.body, symbolize_names: true)[:data][:attributes]
+    if SignInService::TEST_MODE
+      # Return mock introspection data in test mode
+      {
+        first_name: 'Test',
+        middle_name: 'E',
+        last_name: 'User',
+        icn: '123456789V123456',
+        idme_uuid: SecureRandom.uuid,
+        logingov_uuid: SecureRandom.uuid,
+        uuid: SecureRandom.uuid,
+        birth_date: '1990-01-01',
+        email: 'test.user@example.com',
+        gender: 'M',
+        birls_id: '123456',
+        edipi: '1234567890',
+        active_mhv_ids: ['12345'],
+        sec_id: '123456789',
+        vet360_id: '123456789',
+        participant_id: '123456789',
+        cerner_id: '123456789',
+        cerner_facility_ids: ['123'],
+        vha_facility_ids: ['456'],
+        id_theft_flag: false,
+        verified: true
+      }
+    else
+      sis_response = SignInService.client.introspect(access_token:)
+      JSON.parse(sis_response.body, symbolize_names: true)[:data][:attributes]
+    end
   end
 
   def access_token
@@ -319,7 +441,9 @@ helpers do
   end
 
   def valid_access_token?
-    return false if access_token.nil? || access_token_expiration.nil?
+    return false if access_token.nil?
+    return true if SignInService::TEST_MODE && access_token.start_with?('test_')
+    return false if access_token_expiration.nil?
     Time.now.utc < access_token_expiration
   end
 
@@ -330,12 +454,14 @@ helpers do
 
   def access_token_expiration
     @access_token_expiration ||= if cookie_auth?
-                                   Time.parse(info_token&.fetch(:access_token_expiration)).utc
-                                 elsif SignInService::TEST_MODE && access_token&.start_with?('test_')
-                                   Time.now.utc + 3600
-                                 else
-                                   Time.at(JWT.decode(access_token, nil, false).first['exp']).utc
-                                 end
+                                  Time.parse(info_token&.fetch(:access_token_expiration)).utc
+                                elsif SignInService::TEST_MODE && access_token&.start_with?('test_')
+                                  Time.now.utc + 3600
+                                elsif access_token
+                                  Time.at(JWT.decode(access_token, nil, false).first['exp']).utc
+                                end
+  rescue
+    nil
   end
 
   def refresh_token_expiration
@@ -359,15 +485,46 @@ helpers do
 
   def store_tokens(sis_response)
     if cookie_auth?
-      response.headers['set-cookie'] = parse_cookie_header(sis_response.headers['set-cookie'])
+      if sis_response.headers['set-cookie']
+        response.headers['set-cookie'] = parse_cookie_header(sis_response.headers['set-cookie'])
+      else
+        # If no set-cookie header but we have a JSON response, try to handle it as API auth
+        begin
+          body = JSON.parse(sis_response.body, symbolize_names: true)[:data]
+          if body && body[:access_token]
+            logger.info "No set-cookie header but found token in response body, storing in session"
+            session[:access_token] = body[:access_token]
+            session[:refresh_token] = body[:refresh_token]
+            return
+          end
+        rescue => e
+          logger.error "Failed to parse token response: #{e.message}"
+          logger.error "Response body: #{sis_response.body}"
+        end
+        
+        # If we get here, we couldn't handle the response
+        halt 500, { error: 'Token exchange failed', message: 'Invalid response format' }.to_json
+      end
     else
-      body = JSON.parse(sis_response.body, symbolize_names: true)[:data]
-      session[:access_token] = body[:access_token]
-      session[:refresh_token] = body[:refresh_token]
+      begin
+        body = JSON.parse(sis_response.body, symbolize_names: true)[:data]
+        if body && body[:access_token]
+          session[:access_token] = body[:access_token]
+          session[:refresh_token] = body[:refresh_token]
+        else
+          logger.error "No tokens found in response body"
+          halt 500, { error: 'Token exchange failed', message: 'No tokens in response' }.to_json
+        end
+      rescue => e
+        logger.error "Failed to parse token response: #{e.message}"
+        logger.error "Response body: #{sis_response.body}"
+        halt 500, { error: 'Token exchange failed', message: 'Invalid response format' }.to_json
+      end
     end
   end
 
   def parse_cookie_header(cookie_header)
+    return [] if cookie_header.nil? || cookie_header.empty?
     cookie_header.split(/, (?=[^;]+=[^;]+;)/)
   end
 
